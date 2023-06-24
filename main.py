@@ -11,7 +11,7 @@ async def read_root():
 async def load_data():
    global df, df_actores,df_fdir_csv
    
-   df =pd.read_csv('data_output/movies_ultimoexcel.csv',sep=';',encoding='latin1')
+   df =pd.read_csv('data_output/df_movies_api.csv',sep=',',encoding='latin1')
    df_actores = pd.read_csv('data_output/df_actor.csv',sep=';',encoding='latin1')
    df_fdir_csv = pd.read_csv('data_output/df_fdirector_cs.csv',encoding='latin1')
 
@@ -81,7 +81,7 @@ def get_actor(nombre_actor:str):
 def get_director(nombre_director:str):
   '''Se ingresa el nombre de un director y la función retorna el éxito del mismo medido a través
   del retorno, también retorna una lista con la peliculas, año de lanzamiento, retorno, costo y
-  ganacia de cada pelicula.
+  ganancia de cada pelicula.
   '''
   
   retorno_director = df_fdir_csv.groupby('crewdos').sum()['return']
