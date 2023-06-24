@@ -11,8 +11,8 @@ async def read_root():
 async def load_data():
    global df, df_actores,df_fdir_csv
    
-   df =pd.read_excel('data_output/movies_ultimoexcel.csv',encoding='latin1')
-   df_actores = pd.read_excel('data_output/df_actor.csv',encoding='latin1')
+   df =pd.read_csv('data_output/movies_ultimoexcel.csv',sep=';',encoding='latin1')
+   df_actores = pd.read_csv('data_output/df_actor.csv',sep=';',encoding='latin1')
    df_fdir_csv = pd.read_csv('data_output/df_fdirector_cs.csv',encoding='latin1')
 
 
