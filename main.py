@@ -16,9 +16,9 @@ async def load_data():
    df =pd.read_csv('data_output/df_movies_api.csv',sep=',',encoding='latin1')
    df_actores = pd.read_csv('data_output/df_actor.csv',sep=';',encoding='latin1')
    df_fdir_csv = pd.read_csv('data_output/df_fdirector_cs.csv',encoding='latin1')
-   df_recomendacion = pd.read_csv('data_output/df_recomendacion.csv',encoding='latin1')
+   df_recomendacion = pd.read_csv('data_output/df_recomendacion_qui.csv',encoding='latin1')
    # recomendacion
-   tfidf = TfidfVectorizer(stop_words='english',max_features=5000)
+   tfidf = TfidfVectorizer(stop_words='english',max_features=500)
    tfidf_matrix =tfidf.fit_transform(df_recomendacion['noverviwe'])
    cosine_sim = linear_kernel(tfidf_matrix,tfidf_matrix)
    indices = pd.Series(df_recomendacion.index, index=df_recomendacion['title'])
