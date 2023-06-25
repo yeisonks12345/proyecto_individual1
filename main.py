@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 import pandas as pd
 import numpy as np
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import linear_kernel
 app = FastAPI()
 #http://127.0.0.1:8000
 @app.get('/')
@@ -9,11 +11,17 @@ async def read_root():
 
 @app.on_event("startup")
 async def load_data():
-   global df, df_actores,df_fdir_csv
+   global df, df_actores,df_fdir_csv,tfidf,tfidf_matrix,df_recomendacion,cosine_sim,indices
    
    df =pd.read_csv('data_output/df_movies_api.csv',sep=',',encoding='latin1')
    df_actores = pd.read_csv('data_output/df_actor.csv',sep=';',encoding='latin1')
    df_fdir_csv = pd.read_csv('data_output/df_fdirector_cs.csv',encoding='latin1')
+   df_recomendacion = pd.read_csv('data_output/df_recomendacion.csv',encoding='latin1')
+   # recomendacion
+   tfidf = TfidfVectorizer(stop_words='english',max_features=5000)
+   tfidf_matrix =tfidf.fit_transform(df_recomendacion['noverviwe'])
+   cosine_sim = linear_kernel(tfidf_matrix,tfidf_matrix)
+   indices = pd.Series(df_recomendacion.index, index=df_recomendacion['title'])
 
 
 @app.get('/cantidad_filmaciones_mes/({mes})')
@@ -79,6 +87,7 @@ def get_actor(nombre_actor:str):
 
 @app.get('/get_director/({nombre_director})')
 def get_director(nombre_director:str):
+  
   '''Se ingresa el nombre de un director y la función retorna el éxito del mismo medido a través
   del retorno, también retorna una lista con la peliculas, año de lanzamiento, retorno, costo y
   ganancia de cada pelicula.
@@ -95,6 +104,19 @@ def get_director(nombre_director:str):
   
   return {'director':nombre_director,'retorno_dir':r_t_d,'peliculas':pelis,'release_year':release,
           'retorno':retorno,'budget':budget,'revenue':revenue}
+
+@app.get('/recomendacion/({title})')
+def recomendacion(title:str):
+  '''Se ingresa el nombre de una pelicula y la funcion arroja una lista con cinco 
+  peliculas recomendadas.'''     
+       
+  idx= indices[title]
+  sim_scores = list(enumerate(cosine_sim[idx]))
+  sim_scores=sorted(sim_scores,key=lambda x: x[1],reverse =True)
+  sim_scores = sim_scores[1:6]
+  movie_indices = [i[0] for i in sim_scores]
+  respuesta = list(df_recomendacion['title'].iloc[movie_indices])
+  return {'lista cinco peliculas recomendadas': respuesta}
 
 
 
